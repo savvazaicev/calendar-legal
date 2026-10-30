@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calendar — Privacy Policy</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1c1c1e; background: #ffffff; }
+  @media (prefers-color-scheme: dark) { body { color: #f2f2f7; background: #000000; } }
+  main { max-width: 46em; margin: 0 auto; padding: 3rem 1.5rem; }
+  h1 { font-size: 1.9rem; line-height: 1.25; margin-bottom: .5rem; }
+  h2 { font-size: 1.3rem; margin-top: 2rem; }
+  h3 { font-size: 1.1rem; margin-top: 1.5rem; }
+  a { color: #0a66c2; }
+  @media (prefers-color-scheme: dark) { a { color: #4495f2; } }
+  ul { padding-left: 1.4rem; }
+  li { margin: .4rem 0; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .92em; }
+  .meta { color: #6e6e73; font-size: .95rem; }
+  @media (prefers-color-scheme: dark) { .meta { color: #98989d; } }
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #e5e5ea; font-size: .9rem; color: #6e6e73; }
+  @media (prefers-color-scheme: dark) { footer { border-color: #38383a; color: #98989d; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Calendar Privacy Policy</h1>
+  <p class="meta">Effective date: 2026-10-31</p>
+
+  <p>This privacy policy applies to the Calendar app (hereby referred to as "Application") for Meta Quest devices that was created by Savva (hereby referred to as "Service Provider") as a Free service. This service is intended for use "AS IS".</p>
+
+  <h2>Information Collection and Use</h2>
+  <p>The Application has <strong>no accounts, no ads, and no analytics</strong>. The Service Provider does not run any servers and does not collect, sell, or share any of your personal information. To show your schedule, the Application connects to <strong>your own Google account</strong> with your explicit authorization (see <a href="#google">Google sign-in</a> below) and keeps a <strong>local cache</strong> of your calendar data <strong>on your device only</strong>:</p>
+  <ul>
+    <li>Your Google account identifier (email address and display name, obtained from Google when you sign in)</li>
+    <li>Your calendars and their events — cached locally so the month, week, day, and agenda views load quickly and can be refreshed</li>
+    <li>Your OAuth credentials (access and refresh tokens) that the Application uses to reach the Google Calendar API on your behalf</li>
+    <li>Your app settings (preferred view, which calendars are shown, colors, search and filters)</li>
+  </ul>
+  <p>The Application does not gather precise information about the location of your VR device, does not access your contacts, camera, or microphone, and does not use advertising identifiers.</p>
+
+  <h3 id="google">Google sign-in and the Google Calendar API</h3>
+  <p>The Application requires you to sign in with Google to fetch and, where you choose, update your calendar data. Sign-in uses the standard Google consent screen (OAuth 2.0 with PKCE); you decide which permissions to grant, and you can review or revoke them at any time in your Google account settings. With your authorization the Application may:</p>
+  <ul>
+    <li>Read the list of your calendars and their events, in order to display them.</li>
+    <li>Create, modify, or delete events when you add or edit an event inside the Application; such changes are written back to your Google Calendar.</li>
+  </ul>
+  <p>The Application requests the Google <code>Calendar</code> scope plus basic identity scopes (your account email, name, and sign-in identity). Your calendar data remains in your Google account; the Application does not move it to any server of the Service Provider. The way Google collects, uses, and discloses information in connection with your Google account and the Google Calendar service is governed by <a href="https://policies.google.com/privacy">Google&rsquo;s Privacy Policy</a> and <a href="https://policies.google.com/terms">Terms of Service</a>.</p>
+
+  <h3>Optional Meta telemetry</h3>
+  <p>The Application uses the Meta Spatial SDK. Meta may offer <strong>optional, opt-in</strong> diagnostics/telemetry for Meta SDKs; this is governed by Meta&rsquo;s own privacy policy and terms (see <a href="https://www.meta.com/legal/privacy-policy/">Meta Privacy Policy</a>). Telemetry is disabled unless you opt in through the system or SDK prompts, and opting in is not required to use the Application. The Service Provider does not receive, access, or review any telemetry data.</p>
+
+  <h3>Permissions</h3>
+  <p>The Application requests only the <strong>Internet</strong> and <strong>Network state</strong> permissions, which it needs to reach the Google services described above. It requests no other runtime permissions.</p>
+
+  <h2>Where Your Data Is Stored</h2>
+  <p>All Application data is stored <strong>on your device only</strong>:</p>
+  <ul>
+    <li>A local database that caches your calendars, events, and the last sync time.</li>
+    <li>An encrypted preferences store (AES-encrypted, via Android&rsquo;s Jetpack Security) that holds your OAuth tokens, so your refresh token never touches disk in plain text.</li>
+    <li>App preferences (view and display settings).</li>
+  </ul>
+  <p>The Service Provider has no server-side copies of any of this data and cannot access it.</p>
+
+  <h2>Third Party Access</h2>
+  <p>The only third party that receives any of your information is <strong>Google</strong>, because your calendar lives in your Google account and the Application reaches it through Google&rsquo;s API under the authorization you grant. Google&rsquo;s handling of that information is subject to Google&rsquo;s own policies. The Application does not otherwise share, sell, or transmit your information to any third party.</p>
+  <p>The Service Provider may disclose information:</p>
+  <ul>
+    <li>as required by law, such as to comply with a subpoena, or similar legal process;</li>
+    <li>when they believe in good faith that disclosure is necessary to protect their rights, protect your safety or the safety of others, investigate fraud, or respond to a government request.</li>
+  </ul>
+
+  <h2>Your Data and Your Choices</h2>
+  <p>You stay in control of your Google data:</p>
+  <ul>
+    <li><strong>Revoke access</strong> in your Google account settings (Security &rarr; Third-party apps) to stop the Application from reaching your calendar.</li>
+    <li><strong>Sign out</strong> of the account inside the Application; this removes the Application&rsquo;s local tokens and cached data for that account.</li>
+    <li><strong>Uninstall</strong> the Application to remove all of its local data (cache, tokens, and settings) from the device.</li>
+  </ul>
+  <p>Because the Application stores nothing server-side, signing out or deleting the app fully removes your information from the Service Provider&rsquo;s side; your Google Calendar itself is managed by Google.</p>
+
+  <h2>Data Retention Policy</h2>
+  <p>All Application data (cached calendars and events, tokens, settings) is stored <strong>only on your device</strong> and is retained only as long as the Application is installed and signed in. The Service Provider has no server-side copies of your data and cannot access your data. If you sign out or delete the Application, your local data is deleted with it.</p>
+
+  <h2>Children</h2>
+  <p>The Application is intended for users 13 years of age or older. The Service Provider does not knowingly collect personally identifiable information from children under 13, and does not market to them. If you believe a child has provided information to us, please contact the Service Provider at <a href="mailto:oisurka@gmail.com">oisurka@gmail.com</a> so that they can take any necessary actions.</p>
+
+  <h2>Security</h2>
+  <p>The Service Provider is concerned about safeguarding the confidentiality of your information. The Application keeps your data on-device and stores your OAuth tokens in an AES-encrypted store; the calendar cache is kept in the app&rsquo;s private local database. Because the Service Provider does not host your data, there is no server to breach. The Service Provider provides physical, electronic, and procedural safeguards for any information they process or maintain. No method of transmission or storage is 100% secure, and the Service Provider cannot guarantee absolute security.</p>
+
+  <h2>Changes</h2>
+  <p>This Privacy Policy may be updated from time to time for any reason. The Service Provider will notify you of any changes to the Privacy Policy by updating this page with the new Privacy Policy. You are advised to consult this Privacy Policy regularly for any changes, as continued use is deemed approval of all changes.</p>
+  <p>This privacy policy is effective as of 2026-10-31.</p>
+
+  <h2>Your Consent</h2>
+  <p>By using the Application, you are consenting to the processing of your information as set forth in this Privacy Policy now and as amended by us.</p>
+
+  <h2>Contact Us</h2>
+  <p>If you have any questions regarding privacy while using the Application, or have questions about the practices, please contact the Service Provider via email at <a href="mailto:oisurka@gmail.com">oisurka@gmail.com</a>.</p>
+
+  <p class="meta"><em>This document is provided as a template for developer use and does not constitute legal advice.</em></p>
+
+  <footer>
+    <p><a href="index.html">&larr; Calendar legal documents</a> &middot; <a href="terms.html">Terms of Service</a></p>
+  </footer>
+</main>
+</body>
+</html>
