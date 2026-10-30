@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calendar — Google Calendar for Meta Quest</title>
+<meta name="description" content="Calendar is a fast, offline-first 2D calendar for Meta Quest: sign in with Google and get month, week, day and agenda views, two-way sync, full recurrence and ICS — free, private, no ads.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #000000;
+    --text: #f2f2f7;
+    --muted: rgba(242, 242, 247, .62);
+    --faint: rgba(242, 242, 247, .38);
+    --panel: linear-gradient(160deg, #181d24 0%, #0f1216 100%);
+    --panel-border: rgba(255, 255, 255, .08);
+    --card: rgba(255, 255, 255, .045);
+    --indigo: #5c7cfa;
+    --coral: #ff6b57;
+    --green: #30d158;
+    --amber: #ffb020;
+    --sky: #38bdf8;
+    --neutral: #9ba1a6;
+    --radius: 26px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--text);
+    background:
+      radial-gradient(60rem 30rem at 85% -5%, rgba(66, 99, 235, .16), transparent 60%),
+      radial-gradient(50rem 26rem at 8% 12%, rgba(56, 189, 248, .10), transparent 60%),
+      var(--bg);
+  }
+  .wrap { max-width: 72rem; margin: 0 auto; padding: 0 1.5rem; }
+
+  /* ---------- nav ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: blur(14px);
+    background: rgba(0, 0, 0, .55);
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+  }
+  .nav { display: flex; align-items: center; gap: 1.5rem; height: 60px; }
+  .logo { display: flex; align-items: center; gap: .55rem; font-weight: 800; font-size: 1.05rem; letter-spacing: -.01em; color: var(--text); text-decoration: none; }
+  .logo .dot {
+    width: 22px; height: 22px; border-radius: 7px;
+    background: conic-gradient(from 210deg, var(--indigo), var(--sky), var(--green), var(--amber), var(--coral), var(--indigo));
+  }
+  .nav-links { display: flex; gap: 1.2rem; margin-left: auto; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: .92rem; font-weight: 500; }
+  .nav-links a:hover { color: var(--text); }
+  .btn {
+    display: inline-block; padding: .55rem 1.1rem; border-radius: 999px;
+    background: var(--indigo); color: #fff; font-weight: 600; font-size: .92rem;
+    text-decoration: none; border: 0; cursor: pointer;
+    transition: transform .12s ease, filter .12s ease;
+  }
+  .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn.ghost { background: transparent; border: 1px solid rgba(255, 255, 255, .2); color: var(--text); }
+  .btn.ghost:hover { background: rgba(255, 255, 255, .06); }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 4.5rem 0 3rem; }
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 2.5rem; align-items: center; }
+  .eyebrow { font-size: .82rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--sky); margin-bottom: .8rem; }
+  h1 { font-size: clamp(2.4rem, 5vw, 3.4rem); line-height: 1.08; font-weight: 800; letter-spacing: -.02em; margin: 0 0 1rem; }
+  h1 em { font-style: normal; background: linear-gradient(90deg, var(--indigo), var(--sky)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lede { font-size: 1.13rem; color: var(--muted); max-width: 30rem; margin: 0 0 1.4rem; }
+  .badges { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.6rem; }
+  .badge {
+    font-size: .8rem; font-weight: 600; color: var(--muted);
+    border: 1px solid rgba(255, 255, 255, .14); border-radius: 999px; padding: .18rem .7rem;
+  }
+  .cta-row { display: flex; gap: .7rem; flex-wrap: wrap; }
+
+  /* ---------- panels ---------- */
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--radius);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .55);
+    overflow: hidden;
+  }
+  .ph { display: flex; align-items: center; gap: .55rem; padding: .7rem 1rem .4rem; }
+  .chip {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: color-mix(in srgb, var(--ac) 22%, transparent);
+    color: var(--ac); flex: none;
+  }
+  .chip .ic { width: 15px; height: 15px; }
+  .pt { font-size: 1.05rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .picons { margin-left: auto; display: flex; gap: .15rem; color: var(--faint); }
+  .picons .ic { width: 17px; height: 17px; }
+  .pbody { padding: .4rem 1.2rem 1.2rem; }
+  .accentbar { width: 34%; height: 4px; border-radius: 999px; background: var(--ac); margin: .8rem auto 0; }
+  .tnum { font-variant-numeric: tabular-nums; }
+  .big { font-weight: 600; letter-spacing: -.01em; }
+  .hint { font-size: .78rem; color: var(--faint); text-align: center; }
+
+  /* hero cluster */
+  .cluster { position: relative; min-height: 470px; }
+  .cluster .panel { position: absolute; width: min(300px, 82%); }
+  .c-month { top: 0; left: 2%; transform: rotate(-2deg); z-index: 3; }
+  .c-day { top: 60px; right: 0; transform: rotate(1.6deg); z-index: 2; }
+  .c-agenda { bottom: 0; left: 20%; transform: rotate(-.6deg); z-index: 4; }
+
+  /* ---------- sections ---------- */
+  section { padding: 4rem 0; }
+  h2 { font-size: clamp(1.6rem, 3vw, 2.1rem); font-weight: 800; letter-spacing: -.02em; margin: 0 0 .5rem; }
+  .sub { color: var(--muted); max-width: 40rem; margin: 0 0 2.2rem; }
+  .group-label { font-size: .82rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin: 2.2rem 0 .9rem; display: flex; align-items: center; gap: .5rem; }
+  .group-label::after { content: ""; flex: 1; height: 1px; background: rgba(255, 255, 255, .08); }
+
+  /* month mock */
+  .dow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 3px; }
+  .dow span { text-align: center; font-size: .56rem; color: var(--faint); font-weight: 600; }
+  .mgrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+  .cell {
+    position: relative; aspect-ratio: 1; border-radius: 6px;
+    background: rgba(255, 255, 255, .035);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .6rem; color: var(--muted); font-variant-numeric: tabular-nums;
+  }
+  .cell.lead { background: transparent; }
+  .cell.today { background: var(--ac); color: #fff; font-weight: 700; box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--ac) 55%, transparent); }
+  .cell .ev { position: absolute; left: 3px; right: 3px; bottom: 3px; height: 3px; border-radius: 2px; }
+
+  /* week mock */
+  .wk { margin-top: .4rem; }
+  .wkhead { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .wkhead span { text-align: center; font-size: .56rem; color: var(--faint); font-weight: 600; }
+  .wkbody { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 5px; align-items: start; }
+  .wkcol { display: flex; flex-direction: column; gap: 3px; min-height: 122px; }
+  .wevt { display: block; height: 18px; border-radius: 5px; font-size: .54rem; color: #fff; padding: 0 4px; line-height: 18px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+  /* day mock */
+  .dayline { position: relative; margin-top: .6rem; }
+  .dline { position: absolute; left: 0; right: 0; border-top: 1px solid rgba(255, 255, 255, .06); }
+  .dline span { position: absolute; left: 0; top: -8px; font-size: .54rem; color: var(--faint); }
+  .dev { position: absolute; left: 26px; right: 6px; border-radius: 7px; color: #fff; font-size: .56rem; padding: 3px 6px; line-height: 1.2; overflow: hidden; box-shadow: 0 5px 14px rgba(0, 0, 0, .35); }
+
+  /* agenda mock */
+  .agenda { margin-top: .4rem; }
+  .aitem { display: flex; gap: .6rem; padding: .5rem 0; border-bottom: 1px solid rgba(255, 255, 255, .06); }
+  .aitem:last-child { border: 0; }
+  .aitem .at { font-size: .62rem; color: var(--ac); font-weight: 700; width: 34px; flex: none; font-variant-numeric: tabular-nums; }
+  .aitem .an { font-size: .8rem; }
+  .aitem .as { font-size: .62rem; color: var(--faint); }
+
+  /* views grid */
+  .vgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.2rem; }
+  .vgrid .panel { box-shadow: 0 14px 34px rgba(0, 0, 0, .4); }
+  .vgrid .pbody { padding: .7rem 1rem 1.1rem; }
+
+  /* task toggles */
+  .task { display: flex; align-items: center; gap: .6rem; padding: .5rem 0; font-size: .9rem; }
+  .task .box {
+    width: 19px; height: 19px; border-radius: 6px; flex: none;
+    border: 2px solid rgba(255, 255, 255, .25);
+  }
+  .task.done .box { background: var(--green); border-color: var(--green); position: relative; }
+  .task.done .box::after {
+    content: ""; position: absolute; left: 5px; top: 1px; width: 5px; height: 9px;
+    border: solid #062; border-width: 0 2.4px 2.4px 0; transform: rotate(45deg);
+  }
+
+  /* multi-window / sync stage */
+  .multi-stage {
+    position: relative; border-radius: 18px; min-height: 380px; overflow: hidden;
+    background:
+      radial-gradient(30rem 18rem at 70% 20%, rgba(92, 124, 250, .10), transparent 70%),
+      linear-gradient(180deg, #0c0f13, #08090c);
+    border: 1px solid rgba(255, 255, 255, .06);
+  }
+  .multi-stage .panel { position: absolute; width: 250px; }
+  .mw-1 { top: 30px; left: 5%; transform: rotate(-2deg); }
+  .mw-2 { top: 120px; left: 34%; transform: rotate(1.2deg); }
+  .mw-3 { top: 34px; right: 4%; transform: rotate(2.2deg); }
+
+  /* features */
+  .fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; }
+  .fcard { background: var(--card); border: 1px solid rgba(255, 255, 255, .07); border-radius: 18px; padding: 1.3rem; }
+  .fcard .ficon {
+    width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    background: color-mix(in srgb, var(--ac) 18%, transparent); color: var(--ac); margin-bottom: .8rem;
+  }
+  .fcard .ficon .ic { width: 20px; height: 20px; }
+  .fcard h3 { margin: 0 0 .3rem; font-size: 1rem; font-weight: 700; }
+  .fcard p { margin: 0; font-size: .88rem; color: var(--muted); }
+
+  /* how it works */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  .step { position: relative; padding: 1.4rem; border: 1px solid rgba(255, 255, 255, .08); border-radius: 18px; background: var(--card); }
+  .step .n { font-size: .8rem; font-weight: 800; letter-spacing: .1em; color: var(--sky); margin-bottom: .5rem; display: block; }
+  .step h3 { margin: 0 0 .3rem; font-size: 1.02rem; }
+  .step p { margin: 0; font-size: .88rem; color: var(--muted); }
+
+  /* privacy */
+  .priv { display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap; }
+  .priv .shield {
+    width: 54px; height: 54px; border-radius: 18px; flex: none;
+    display: flex; align-items: center; justify-content: center;
+    background: color-mix(in srgb, var(--green) 16%, transparent); color: var(--green);
+  }
+  .priv .shield .ic { width: 28px; height: 28px; }
+  .priv div { max-width: 42rem; color: var(--muted); font-size: .98rem; }
+  .priv a { color: var(--sky); }
+
+  /* footer */
+  footer { border-top: 1px solid rgba(255, 255, 255, .07); padding: 2rem 0 2.5rem; margin-top: 2rem; }
+  .foot { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; font-size: .88rem; color: var(--muted); }
+  .foot a { color: var(--muted); text-decoration: none; }
+  .foot a:hover { color: var(--text); }
+
+  .ic { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .cluster { min-height: 0; display: grid; gap: 1rem; margin-top: .5rem; }
+    .cluster .panel { position: static; transform: none !important; width: 100%; }
+    .steps { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .vgrid { grid-template-columns: 1fr; }
+    .multi-stage { min-height: 0; display: grid; gap: 1rem; }
+    .multi-stage .panel { position: static; transform: none !important; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-month" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M3 8h18M3 13h18M9 3v18M15 3v18"/></symbol>
+  <symbol id="i-week" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M8 4v16M12 4v16M16 4v16"/></symbol>
+  <symbol id="i-day" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M5 8h14M5 14h14"/></symbol>
+  <symbol id="i-agenda" viewBox="0 0 24 24"><circle cx="4" cy="6" r="1.1"/><circle cx="4" cy="12" r="1.1"/><circle cx="4" cy="18" r="1.1"/><path d="M9 6h11M9 12h11M9 18h11"/></symbol>
+  <symbol id="i-sync" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.5-5.8L20 8M20 12a8 8 0 0 1-13.5 5.8L4 16"/><path d="M20 4v4h-4M4 20v-4h4"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5l-4.5-4.5"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 5.5h16l-6.2 7.2v4.6l-3.6 2v-6.6L4 5.5z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M4 12V9.5A2.5 2.5 0 0 1 6.5 7H16M16 7l-2.5-2.5M16 7l-2.5 2.5"/><path d="M20 12v2.5A2.5 2.5 0 0 1 17.5 17H8M8 17l2.5-2.5M8 17l2.5 2.5"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v10M8 11l4 4 4-4M5 19h14"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18a4.5 4.5 0 1 1 .9-8.9A5.5 5.5 0 0 1 18.6 11 3.5 3.5 0 0 1 18 18H7z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7.5 3v5.6c0 4.8-3.2 7.9-7.5 9.4-4.3-1.5-7.5-4.6-7.5-9.4V6L12 3z"/><path d="M9 12l2.2 2.2L15.5 9.7"/></symbol>
+  <symbol id="i-feather" viewBox="0 0 24 24"><path d="M13 2L4.5 13.5H10L9 22l8.5-11.5H12L13 2z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M4.9 4.9L6.6 6.6M17.4 17.4l1.7 1.7M19.1 4.9L17.4 6.6M6.6 17.4l-1.7 1.7"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M18.7 5.3l-1.8 1.8M7.1 16.9l-1.8 1.8"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+</svg>
+
+<nav>
+  <div class="wrap nav">
+    <a class="logo" href="#"><span class="dot"></span>Calendar</a>
+    <div class="nav-links">
+      <a href="#views">Views</a>
+      <a href="#sync">Google sync</a>
+      <a href="#features">Features</a>
+      <a href="#privacy">Privacy</a>
+    </div>
+    <a class="btn" href="#views">See the views</a>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">For Meta Quest · Horizon OS</p>
+      <h1>Your Google Calendar, in <em>four living views</em></h1>
+      <p class="lede">Sign in with Google and your schedule shows up in a fast, offline-first 2D app — month, week, day and agenda. Create, edit and sync events; every view stays current.</p>
+      <div class="badges">
+        <span class="badge">Google Calendar sync</span>
+        <span class="badge">4 views</span>
+        <span class="badge">Full recurrence</span>
+        <span class="badge">ICS import / export</span>
+        <span class="badge">Works offline</span>
+        <span class="badge">Free · No ads</span>
+      </div>
+      <div class="cta-row">
+        <a class="btn" href="#views">Explore the views</a>
+        <a class="btn ghost" href="privacy.html">Privacy policy</a>
+      </div>
+    </div>
+
+    <div class="cluster">
+      <div class="panel c-month" style="--ac: var(--indigo)">
+        <div class="ph">
+          <span class="chip"><svg class="ic"><use href="#i-month"/></svg></span>
+          <span class="pt">October 2026</span>
+          <span class="picons"><svg class="ic"><use href="#i-gear"/></svg><svg class="ic"><use href="#i-x"/></svg></span>
+        </div>
+        <div class="pbody">
+          <div class="dow"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+          <div class="mgrid">
+            <div class="cell lead"></div><div class="cell lead"></div><div class="cell lead"></div>
+            <div class="cell">1</div><div class="cell">2</div><div class="cell">3</div><div class="cell">4</div>
+            <div class="cell">5</div><div class="cell">6</div><div class="cell">7<span class="ev" style="background:var(--indigo)"></span></div><div class="cell">8</div><div class="cell">9</div><div class="cell">10</div><div class="cell">11</div>
+            <div class="cell">12</div><div class="cell">13</div><div class="cell">14</div><div class="cell">15<span class="ev" style="background:var(--coral)"></span></div><div class="cell">16</div><div class="cell">17</div><div class="cell">18</div>
+            <div class="cell">19</div><div class="cell">20</div><div class="cell">21</div><div class="cell">22<span class="ev" style="background:var(--green)"></span></div><div class="cell">23</div><div class="cell">24</div><div class="cell">25</div>
+            <div class="cell">26</div><div class="cell">27</div><div class="cell">28<span class="ev" style="background:var(--sky)"></span></div><div class="cell">29</div><div class="cell">30</div><div class="cell today">31</div><div class="cell lead"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel c-day" style="--ac: var(--coral)">
+        <div class="ph">
+          <span class="chip"><svg class="ic"><use href="#i-day"/></svg></span>
+          <span class="pt">Today</span>
+          <span class="picons"><svg class="ic"><use href="#i-gear"/></svg><svg class="ic"><use href="#i-x"/></svg></span>
+        </div>
+        <div class="pbody">
+          <div class="dayline" style="height:150px">
+            <div class="dline" style="top:0"><span>09</span></div>
+            <div class="dline" style="top:30px"><span>10</span></div>
+            <div class="dline" style="top:60px"><span>11</span></div>
+            <div class="dline" style="top:90px"><span>12</span></div>
+            <div class="dline" style="top:120px"><span>13</span></div>
+            <div class="dev" style="top:16px;height:28px;background:var(--coral)">Design review</div>
+            <div class="dev" style="top:64px;height:22px;background:var(--sky)">1:1 · Ana</div>
+            <div class="dev" style="top:104px;height:22px;background:var(--green)">Gym</div>
+          </div>
+          <p class="hint" style="margin-top:.6rem">Now <span data-clock>--:--:--</span></p>
+        </div>
+      </div>
+
+      <div class="panel c-agenda" style="--ac: var(--green)">
+        <div class="ph">
+          <span class="chip"><svg class="ic"><use href="#i-agenda"/></svg></span>
+          <span class="pt">Upcoming</span>
+          <span class="picons"><svg class="ic"><use href="#i-search"/></svg></span>
+        </div>
+        <div class="pbody">
+          <div class="agenda">
+            <div class="aitem"><span class="at">10:00</span><div><div class="an">Design review</div><div class="as">30 m · Meeting room</div></div></div>
+            <div class="aitem"><span class="at">12:30</span><div><div class="an">Lunch with Sam</div><div class="as">1 h · Cafeteria</div></div></div>
+            <div class="aitem"><span class="at">15:00</span><div><div class="an">Sprint planning</div><div class="as">1 h 30 m</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ VIEWS ============ -->
+<section id="views">
+  <div class="wrap">
+    <h2>Four views, one schedule</h2>
+    <p class="sub">Month for the big picture, week and day for the detail, agenda for a plain running list. Switch instantly — they all read the same synced data.</p>
+    <div class="vgrid">
+
+      <div class="panel" style="--ac: var(--indigo)">
+        <div class="ph"><span class="chip"><svg class="ic"><use href="#i-month"/></svg></span><span class="pt">Month</span></div>
+        <div class="pbody">
+          <div class="dow"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+          <div class="mgrid">
+            <div class="cell lead"></div><div class="cell lead"></div><div class="cell lead"></div>
+            <div class="cell">1</div><div class="cell">2</div><div class="cell">3</div><div class="cell">4</div>
+            <div class="cell">5</div><div class="cell">6</div><div class="cell">7<span class="ev" style="background:var(--indigo)"></span></div><div class="cell">8</div><div class="cell">9</div><div class="cell">10</div><div class="cell">11</div>
+            <div class="cell">12</div><div class="cell">13</div><div class="cell">14</div><div class="cell">15<span class="ev" style="background:var(--coral)"></span></div><div class="cell">16</div><div class="cell">17</div><div class="cell">18</div>
+            <div class="cell">19</div><div class="cell">20</div><div class="cell">21</div><div class="cell">22<span class="ev" style="background:var(--green)"></span></div><div class="cell">23</div><div class="cell">24</div><div class="cell">25</div>
+            <div class="cell">26</div><div class="cell">27</div><div class="cell">28</div><div class="cell">29</div><div class="cell">30</div><div class="cell today">31</div><div class="cell lead"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="--ac: var(--sky)">
+        <div class="ph"><span class="chip"><svg class="ic"><use href="#i-week"/></svg></span><span class="pt">Week</span></div>
+        <div class="pbody">
+          <div class="wk">
+            <div class="wkhead"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+            <div class="wkbody">
+              <div class="wkcol"><span class="wevt" style="background:var(--sky)">Standup</span></div>
+              <div class="wkcol"></div>
+              <div class="wkcol"><span class="wevt" style="background:var(--coral);height:34px">Release</span></div>
+              <div class="wkcol"><span class="wevt" style="background:var(--green)">1:1</span></div>
+              <div class="wkcol"></div>
+              <div class="wkcol"><span class="wevt" style="background:var(--amber);height:30px">Dentist</span></div>
+              <div class="wkcol"><span class="wevt" style="background:var(--indigo)">Brunch</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="--ac: var(--coral)">
+        <div class="ph"><span class="chip"><svg class="ic"><use href="#i-day"/></svg></span><span class="pt">Day</span></div>
+        <div class="pbody">
+          <div class="dayline" style="height:170px">
+            <div class="dline" style="top:0"><span>09</span></div>
+            <div class="dline" style="top:34px"><span>10</span></div>
+            <div class="dline" style="top:68px"><span>11</span></div>
+            <div class="dline" style="top:102px"><span>12</span></div>
+            <div class="dline" style="top:136px"><span>13</span></div>
+            <div class="dev" style="top:18px;height:30px;background:var(--coral)">Design review</div>
+            <div class="dev" style="top:72px;height:24px;background:var(--sky)">1:1 · Ana</div>
+            <div class="dev" style="top:112px;height:30px;background:var(--green)">Lunch</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="--ac: var(--green)">
+        <div class="ph"><span class="chip"><svg class="ic"><use href="#i-agenda"/></svg></span><span class="pt">Agenda</span></div>
+        <div class="pbody">
+          <div class="agenda">
+            <div class="aitem"><span class="at">10:00</span><div><div class="an">Design review</div><div class="as">Meeting room · 30 m</div></div></div>
+            <div class="aitem"><span class="at">12:30</span><div><div class="an">Lunch with Sam</div><div class="as">Cafeteria · 1 h</div></div></div>
+            <div class="aitem"><span class="at">15:00</span><div><div class="an">Sprint planning</div><div class="as">1 h 30 m · Online</div></div></div>
+            <div class="aitem"><span class="at">19:00</span><div><div class="an">Yoga</div><div class="as">Gym · 45 m</div></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<!-- ============ SYNC ============ -->
+<section id="sync" style="padding-top:0">
+  <div class="wrap">
+    <h2>One tap from Google</h2>
+    <p class="sub">Sign in on the Google consent screen and your calendars sync — two-way, with a local cache so every view opens instantly, even offline. Add an event in the app and it lands in Google; change it there and it is back here on the next sync.</p>
+    <div class="multi-stage">
+      <div class="panel mw-1" style="--ac: var(--indigo)">
+        <div class="ph"><span class="chip"><svg class="ic"><use href="#i-cloud"/></svg></span><span class="pt">Google account</span></div>
+        <div class="pbody" style="text-align:center; padding-top:.7rem">
+          <div style="width:46px;height:46px;border-radius:50%;background:conic-gradient(from 200deg,var(--indigo),var(--sky),var(--green),var(--indigo));margin:0 auto .55rem;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff">S</div>
+          <div style="font-size:.85rem;font-weight:600">you@gmail.com</div>
+          <div class="hint" style="margin-top:.25rem">Connected</div>
+        </div>
+      </div>
+      <div class="panel mw-2" style="--ac: var(--sky)">
+        <div class="ph"><span class="chip"><svg class="ic"><use href="#i-filter"/></svg></span><span class="pt">Calendars</span></div>
+        <div class="pbody">
+          <div class="task done"><span class="box"></span><span style="display:flex;align-items:center;gap:.45rem"><i style="width:8px;height:8px;border-radius:2px;background:var(--indigo)"></i>Work</span></div>
+          <div class="task done"><span class="box"></span><span style="display:flex;align-items:center;gap:.45rem"><i style="width:8px;height:8px;border-radius:2px;background:var(--coral)"></i>Personal</span></div>
+          <div class="task"><span class="box"></span><span style="display:flex;align-items:center;gap:.45rem"><i style="width:8px;height:8px;border-radius:2px;background:var(--sky)"></i>Holidays</span></div>
+        </div>
+      </div>
+      <div class="panel mw-3" style="--ac: var(--green)">
+        <div class="ph"><span class="chip"><svg class="ic"><use href="#i-sync"/></svg></span><span class="pt">Sync</span></div>
+        <div class="pbody" style="text-align:center; padding-top:.5rem">
+          <div style="font-size:1.15rem;font-weight:600;color:var(--green)">Up to date</div>
+          <div class="hint" style="margin-top:.35rem">Synced just now · 128 events</div>
+          <div class="accentbar" style="width:32%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section id="features" style="padding-top:0">
+  <div class="wrap">
+    <h2>What you get</h2>
+    <p class="sub">No subscriptions, no onboarding maze, no server to log into.</p>
+    <div class="fgrid">
+      <div class="fcard" style="--ac: var(--indigo)">
+        <div class="ficon"><svg class="ic"><use href="#i-cal"/></svg></div>
+        <h3>Four living views</h3>
+        <p>Month, week, day and agenda — each tuned for a different job, all from the same data.</p>
+      </div>
+      <div class="fcard" style="--ac: var(--sky)">
+        <div class="ficon"><svg class="ic"><use href="#i-cloud"/></svg></div>
+        <h3>Google Calendar sync</h3>
+        <p>Two-way sync with an on-device cache. Create and edit events right in the app.</p>
+      </div>
+      <div class="fcard" style="--ac: var(--coral)">
+        <div class="ficon"><svg class="ic"><use href="#i-repeat"/></svg></div>
+        <h3>Real recurrence</h3>
+        <p>A built-in RRule engine expands recurring and all-day events the way Google does.</p>
+      </div>
+      <div class="fcard" style="--ac: var(--green)">
+        <div class="ficon"><svg class="ic"><use href="#i-download"/></svg></div>
+        <h3>ICS import &amp; export</h3>
+        <p>Bring events in or take them out with standard ICS files, no lock-in.</p>
+      </div>
+      <div class="fcard" style="--ac: var(--amber)">
+        <div class="ficon"><svg class="ic"><use href="#i-search"/></svg></div>
+        <h3>Find anything</h3>
+        <p>Fast search across every calendar, with per-calendar filters and colors.</p>
+      </div>
+      <div class="fcard" style="--ac: var(--green)">
+        <div class="ficon"><svg class="ic"><use href="#i-shield"/></svg></div>
+        <h3>Private by design</h3>
+        <p>No ads, no accounts of its own. Tokens are stored AES-encrypted on-device.</p>
+      </div>
+      <div class="fcard" style="--ac: var(--amber)">
+        <div class="ficon"><svg class="ic"><use href="#i-feather"/></svg></div>
+        <h3>Featherweight</h3>
+        <p>A pure 2D app — no VR scene to load, nothing to wear off.</p>
+      </div>
+      <div class="fcard" style="--ac: var(--neutral)">
+        <div class="ficon"><svg class="ic"><use href="#i-sun"/></svg></div>
+        <h3>Light &amp; dark</h3>
+        <p>Follows the system theme. The same UISet look as Horizon itself.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW ============ -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <p class="sub">Three steps, ten seconds.</p>
+    <div class="steps">
+      <div class="step">
+        <span class="n">01</span>
+        <h3>Sign in with Google</h3>
+        <p>One tap on the Google consent screen. Calendar, email and name — that is all it asks.</p>
+      </div>
+      <div class="step">
+        <span class="n">02</span>
+        <h3>Pick a view</h3>
+        <p>Month for the big picture, week and day for the detail, agenda for a plain list.</p>
+      </div>
+      <div class="step">
+        <span class="n">03</span>
+        <h3>Create &amp; sync</h3>
+        <p>Add or edit events; they write straight back to Google and the local cache stays fresh.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRIVACY ============ -->
+<section id="privacy" style="padding-top:0">
+  <div class="wrap">
+    <div class="priv">
+      <div class="shield"><svg class="ic"><use href="#i-shield"/></svg></div>
+      <div>
+        <h2 style="margin-bottom:.4rem">Your calendar stays yours</h2>
+        <p>Calendar data is cached locally on the headset and tokens live in an AES-encrypted store — there is no server of ours to breach. The only data that leaves the device goes to Google, the account you signed into, under the authorization you grant. Read the full <a href="privacy.html">Privacy Policy</a> and <a href="terms.html">Terms of Service</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <div>Calendar — Google Calendar for Meta Quest · Free · No ads · No accounts</div>
+    <div><a href="index.html">Legal</a> · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms of Service</a></div>
+    <div>Contact: <a href="mailto:oisurka@gmail.com">oisurka@gmail.com</a></div>
+  </div>
+</footer>
+
+<script>
+  const pad = (n) => String(n).padStart(2, "0");
+  function clocks() {
+    const d = new Date();
+    const t = pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+    document.querySelectorAll("[data-clock]").forEach((el) => { el.textContent = t; });
+  }
+  clocks();
+  setInterval(clocks, 1000);
+</script>
+</body>
+</html>
